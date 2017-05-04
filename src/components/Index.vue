@@ -3,9 +3,9 @@
     <section class="section">
     <div class="container">
       <div class="heading">
-        <h1 class="title">smartfarm-1f904</h1>
+        <h1 class="title">ฟาร์มไก่กุ๊กกุ๊ก 🐣</h1>
         <h2 class="subtitle">
-          ตำบล เนินหอม อำเภอเมืองปราจีนบุรี ปราจีนบุรี <br>
+          ตำบลเนินหอม อำเภอเมือง จังหวัดปราจีนบุรี<br>
           <strong>{{date}}</strong>
         </h2>
       </div>
@@ -32,14 +32,15 @@
       </div>
 
       <div class="columns">
-        <div class="column button is-success setDis1">
+        <div class="column button is-success setDis1" :class="{ 'is-loading': loading }">
           <span style="font-size: 55px;">ระดับอาหาร <br> 30% </span> <br>
-          <progress class="progress is-danger" value="30" max="100"></progress>
         </div>
       </div>
 
     </div>
   </section>
+
+  <log :db="db" :db2="db2" :page="page" />
 
 
   </div>
@@ -48,6 +49,7 @@
 <script>
 /* global moment */
 import axios from 'axios'
+import Log from './log'
 export default {
   name: 'Index',
   data () {
@@ -56,7 +58,9 @@ export default {
       db: [],
       loading: true,
       turn: 'ON LIGHT',
-      toggleLight: true
+      toggleLight: true,
+      db2: [],
+      page: '1'
     }
   },
   mounted () {
@@ -64,7 +68,10 @@ export default {
     let vm = this
     setInterval(() => {
       vm.getApi()
-    }, 10000)
+    }, 3000)
+  },
+  components: {
+    Log
   },
   computed: {
     temp () {
@@ -80,23 +87,41 @@ export default {
         this.db.reverse()
         return this.db[0].hum
       } else return 'loading...'
+    },
+    food () {
+      if (this.db2.length > 0) {
+        this.loading = false
+        this.db2.reverse()
+        return this.db2[0].cm
+      } else return 'loading...'
     }
   },
   methods: {
     getApi () {
       let vm = this
-      let arr = []
       axios.get('https://smartfarm-1f904.firebaseio.com/data.json').then(res => {
         for (var index in res.data) {
           if (res.data.hasOwnProperty(index)) {
-            arr.push({
+            vm.db.push({
               ...res.data[index],
               id: index
             })
           }
         }
       }).then(() => {
-        vm.db = arr
+        vm.db.reverse()
+        axios.get('https://smartfarm-1f904.firebaseio.com/feed.json').then((res) => {
+          for (var index in res.data) {
+            if (res.data.hasOwnProperty(index)) {
+              vm.db2.push({
+                ...res.data[index],
+                id: index
+              })
+            }
+          }
+        })
+      }).then(() => {
+        vm.db2.reverse()
       })
     },
     turnLight () {
