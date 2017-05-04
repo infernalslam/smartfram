@@ -73,6 +73,13 @@ var mqttSend = function (topic, msg) {
   message.destinationName = topic
   client.send(message)
 }
+client.onConnectionLost = function (responseObject) {
+  if (responseObject.errorCode !== 0) {
+    setTimeout(() => {
+      client.connect()
+    }, 1000)
+  }
+}
 import axios from 'axios'
 import Log from './log'
 export default {
