@@ -42,9 +42,9 @@
       </tr>
     </thead>
     <thead>
-      <tr v-for="s in db2">
-        <td><center>{{s.date}}</center></td>
-        <td><center>{{s.cm}}</center></td>
+      <tr v-for="sa in db2">
+        <td><center>{{sa.date}}</center></td>
+        <td><center>{{sa.cm}}</center></td>
       </tr>
     </thead>
 </table>

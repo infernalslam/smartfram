@@ -92,7 +92,7 @@ export default {
       turn: 'ON LIGHT',
       toggleLight: true,
       db2: [],
-      page: '1'
+      page: '0'
     }
   },
   mounted () {
@@ -131,28 +131,30 @@ export default {
   methods: {
     getApi () {
       let vm = this
+      let arr = []
+      let arr2 = []
       axios.get('https://smartfarm-1f904.firebaseio.com/data.json').then(res => {
         for (var index in res.data) {
           if (res.data.hasOwnProperty(index)) {
-            vm.db.push({
+            arr.push({
               ...res.data[index],
               id: index
             })
           }
         }
-      }).then(() => {
+        vm.db = arr
         vm.db.reverse()
         axios.get('https://smartfarm-1f904.firebaseio.com/feed.json').then((res) => {
           for (var index in res.data) {
             if (res.data.hasOwnProperty(index)) {
-              vm.db2.push({
+              arr2.push({
                 ...res.data[index],
                 id: index
               })
             }
           }
         })
-      }).then(() => {
+        vm.db2 = arr2
         vm.db2.reverse()
       })
     },
