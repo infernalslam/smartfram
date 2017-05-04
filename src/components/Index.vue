@@ -14,13 +14,30 @@
 
   <section class="section">
     <div class="container">
+
       <div class="columns">
-        <div class="column button is-primary" :class="{ 'is-loading': loading }" style="font-size: 30px; text-align: center;"> {{temp}} °C
-        </div>
+        <div class="column is-11"></div>
         <div class="column">
-          <h1 style="font-size: 30px; text-align: center;">{{ hum }} %</h1>
+          <a class="button is-outlined" :class="{'is-danger': toggleLight }" @click="turnLight()">{{turn}}</a>
         </div>
       </div>
+
+      <div class="columns">
+        <div class="column button is-primary setDis1" :class="{ 'is-loading': loading }" style="font-size: 55px; text-align: center;">
+          <span> อุณหภูมิ <br> {{temp}} °C </span>
+        </div>
+          <div class="column button is-danger setDis2" :class="{ 'is-loading': loading }" style="font-size: 55px; text-align: center;">
+          <span> ความชื้น <br> {{hum}} % </span>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column button is-success setDis1">
+          <span style="font-size: 55px;">ระดับอาหาร <br> 30% </span> <br>
+          <progress class="progress is-danger" value="30" max="100"></progress>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -37,7 +54,9 @@ export default {
     return {
       date: moment().format('LLL'),
       db: [],
-      loading: true
+      loading: true,
+      turn: 'ON LIGHT',
+      toggleLight: true
     }
   },
   mounted () {
@@ -56,6 +75,7 @@ export default {
     },
     hum () {
       if (this.db.length > 0) {
+        this.loading = false
         return this.db[this.db.length - 1].hum
       } else return 'loading...'
     }
@@ -77,7 +97,31 @@ export default {
         vm.db = arr
         console.log(vm.db)
       })
+    },
+    turnLight () {
+      if (this.turn === 'ON LIGHT') {
+        this.toggleLight = false
+        this.turn = 'OFF LIGHT'
+      } else if (this.turn === 'OFF LIGHT') {
+        this.toggleLight = true
+        this.turn = 'ON LIGHT'
+      }
     }
   }
 }
 </script>
+
+<style>
+.setDis1 {
+  position: relative;
+  height: 35vh;
+}
+.setDis2 {
+  position: relative;
+  height: 35vh;
+}
+.setDis3 {
+  position: relative;
+  height: 25vh;
+}
+</style>
