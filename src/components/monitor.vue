@@ -13,7 +13,8 @@ export default {
     return {
       temp: [],
       hum: [],
-      all: []
+      all: [],
+      date: []
     }
   },
   mounted () {
@@ -21,16 +22,13 @@ export default {
     this.getData()
     setInterval(() => {
       vm.getData()
-      setTimeout(() => {
-        vm.getChart()
-      }, 2000)
-    }, 4000)
+    }, 3000)
   },
   methods: {
     getChart () {
       var ctx = document.getElementById('myChart')
       var data = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        labels: this.date,
         datasets: [
           {
             label: 'Temp',
@@ -92,18 +90,18 @@ export default {
     },
     getData () {
       let vm = this
+      let arr = []
       axios.get('https://smartfarm-1f904.firebaseio.com/data.json').then((res) => {
         for (var index in res.data) {
           if (res.data.hasOwnProperty(index)) {
-            vm.all.push({
-              ...res.data[index],
-              id: index
-            })
+            arr.push(res.data[index])
           }
-          console.log(vm.all)
         }
+        vm.all = arr
         vm.temp = vm.all.map(i => i.temp)
         vm.hum = vm.all.map(i => i.hum)
+        vm.date = vm.all.map(i => i.date)
+        vm.getChart()
       })
     }
   }
