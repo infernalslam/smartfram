@@ -33,7 +33,7 @@
 
       <div class="columns">
         <div class="column button is-success setDis1" :class="{ 'is-loading': loading }">
-          <span style="font-size: 55px;">ระดับอาหาร <br> 30% </span> <br>
+          <span style="font-size: 55px;">ระดับอาหาร <br> {{ 100 - food }}% </span> <br>
         </div>
       </div>
 
@@ -47,7 +47,32 @@
 </template>
 
 <script>
-/* global moment */
+/* global moment, Paho */
+var config = {
+  mqtt_server: 'm12.cloudmqtt.com',
+  mqtt_websockets_port: 32441,
+  mqtt_user: 'nuuloiub',
+  mqtt_password: 'Tb_2kf9fEyzR'
+}
+var client = new Paho.MQTT.Client(config.mqtt_server, config.mqtt_websockets_port, config.mqtt_user)
+client.connect({
+  useSSL: true,
+  userName: config.mqtt_user,
+  password: config.mqtt_password,
+  onSuccess: function () {
+    console.log('mqtt success')
+    client.subscribe('/ESP/LED')
+    mqttSend('/ESP/LED', 'GET')
+  },
+  onFailure: function (e) {
+    console.log(e)
+  }
+})
+var mqttSend = function (topic, msg) {
+  var message = new Paho.MQTT.Message(msg)
+  message.destinationName = topic
+  client.send(message)
+}
 import axios from 'axios'
 import Log from './log'
 export default {
@@ -92,7 +117,7 @@ export default {
       if (this.db2.length > 0) {
         this.loading = false
         this.db2.reverse()
-        return this.db2[0].cm
+        return (this.db2[0].cm / 10) * 100
       } else return 'loading...'
     }
   },
@@ -126,9 +151,11 @@ export default {
     },
     turnLight () {
       if (this.turn === 'ON LIGHT') {
+        mqttSend('/ESP/LED', 'LEDON')
         this.toggleLight = false
         this.turn = 'OFF LIGHT'
       } else if (this.turn === 'OFF LIGHT') {
+        mqttSend('/ESP/LED', 'LEDOFF')
         this.toggleLight = true
         this.turn = 'ON LIGHT'
       }
