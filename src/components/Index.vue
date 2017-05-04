@@ -64,19 +64,21 @@ export default {
     let vm = this
     setInterval(() => {
       vm.getApi()
-    }, 1000)
+    }, 10000)
   },
   computed: {
     temp () {
       if (this.db.length > 0) {
         this.loading = false
-        return this.db[this.db.length - 1].temp
+        this.db.reverse()
+        return this.db[0].temp
       } else return 'loading...'
     },
     hum () {
       if (this.db.length > 0) {
         this.loading = false
-        return this.db[this.db.length - 1].hum
+        this.db.reverse()
+        return this.db[0].hum
       } else return 'loading...'
     }
   },
@@ -95,7 +97,6 @@ export default {
         }
       }).then(() => {
         vm.db = arr
-        console.log(vm.db)
       })
     },
     turnLight () {
